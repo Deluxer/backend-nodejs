@@ -1,42 +1,66 @@
 import { response } from "express";
+import User from "../models/user.js";
+import bcryptjs from 'bcryptjs';
+import { validationResult } from "express-validator";
 
-export const getUser = (req = request, res = response) => {
+export const getUser = async(req = request, res = response) => {
+    const query = { state: true };
+    const { limit = 5, from = 0 } = req.query;
 
-    const { q, name, apiKey, page = 1, limit} = req.query;
+    const [ total, users ] = await Promise.all([
+        User.countDocuments(query),
+        User.find(query)
+            .skip( from )
+            .limit( limit )
+    ])
 
    res.json({
-        msg: 'get API - controller',
-        q,
-        name,
-        apiKey,
-        page
+        total,
+        users
     });
 }
 
-export const postUser = (req, resp = response ) => {
+export const postUser = async(req, resp = response ) => {
 
-    const { name, age } = req.body;
+    const { name, email, password, rol } = req.body;
+    const user = new User({ name , email, password, rol});
+
+    const salt = bcryptjs.genSaltSync();
+    user.password = bcryptjs.hashSync(password, salt);
+
+    await user.save();
 
     resp.json({
         msg: 'Put API - controller',
-        name,
-        age
+        user
     });
 };
 
-export const putUser = (req, resp = response) => {
+export const putUser = async(req, resp = response) => {
 
-    const params = req.params
+    const { id } = req.params
+    const { _id, password, gogle, email, ...params} = req.body;
+
+    if(password) {
+        const salt = bcryptjs.genSaltSync();
+        params.password = bcryptjs.hashSync(password, salt);
+    
+    }
+
+    const user = await User.findByIdAndUpdate(id, params);
+    
     resp.json({
         msg: 'Put API - controller',
-        id: params.userId
+        user
     });
 };
 
-export const deleteUser = (req, resp = response) => {
-    resp.json({
-        msg: 'Delete API - controller'
-    });
+export const deleteUser = async(req, resp = response) => {
+
+    const { id } = req.params;
+    const user = await User.findByIdAndUpdate( id, { state: false} );
+
+    resp.json(user)
 }
 
 
