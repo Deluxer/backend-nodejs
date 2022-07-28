@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors';
-import user from '../routes/user.js';
+import userRoute from '../routes/userRoute.js';
 import { dbConnection } from '../database/config.js';
 
 export class Server {
@@ -36,7 +36,7 @@ export class Server {
     }
     
     router() {
-        this.app.use(this.userPath, user);
+        this.app.use(this.userPath, userRoute);
     }
 
     listen() {

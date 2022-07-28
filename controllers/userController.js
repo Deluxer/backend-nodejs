@@ -62,5 +62,3 @@ export const deleteUser = async(req, resp = response) => {
 
     resp.json(user)
 }
-
-

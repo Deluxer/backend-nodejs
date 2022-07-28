@@ -1,9 +1,25 @@
-# Webserver + Restserver
+# Backend CRUD Webserver + Restserver
 
-
-Instalation
+> Requirements
 
 ```
-npm installl
+Node js v16.13
+MongoDb (Mongo Compass)
+```
 
+> Dependencies
+
+```
+mongoose
+express-validator
+cors
+bcryptjs
+dotenv
+```
+
+> Instalation
+
+```
+npm install
+npm start
 ```
