@@ -1,5 +1,5 @@
-import { response } from "express";
-import User from "../models/user.js";
+import { json, response } from "express";
+import UserModel from "../models/UserModel.js";
 import bcryptjs from 'bcryptjs';
 import { validationResult } from "express-validator";
 
@@ -8,8 +8,8 @@ export const getUser = async(req = request, res = response) => {
     const { limit = 5, from = 0 } = req.query;
 
     const [ total, users ] = await Promise.all([
-        User.countDocuments(query),
-        User.find(query)
+        UserModel.countDocuments(query),
+        UserModel.find(query)
             .skip( from )
             .limit( limit )
     ])
@@ -23,7 +23,7 @@ export const getUser = async(req = request, res = response) => {
 export const postUser = async(req, resp = response ) => {
 
     const { name, email, password, rol } = req.body;
-    const user = new User({ name , email, password, rol});
+    const user = new UserModel({ name , email, password, rol});
 
     const salt = bcryptjs.genSaltSync();
     user.password = bcryptjs.hashSync(password, salt);
@@ -47,7 +47,7 @@ export const putUser = async(req, resp = response) => {
     
     }
 
-    const user = await User.findByIdAndUpdate(id, params);
+    const user = await UserModel.findByIdAndUpdate(id, params);
     
     resp.json({
         msg: 'Put API - controller',
@@ -57,8 +57,20 @@ export const putUser = async(req, resp = response) => {
 
 export const deleteUser = async(req, resp = response) => {
 
-    const { id } = req.params;
-    const user = await User.findByIdAndUpdate( id, { state: false} );
+    const { id, uid } = req.params;
+    const user = await UserModel.findByIdAndUpdate( id, { state: false} );
 
-    resp.json(user)
+    if ( !user) {
+        return resp.status(401).json({
+            msg: 'User nor found'
+        });
+    }
+
+    if( user.state ) {
+        return resp.status(401).json({
+            msg: 'Token no valido'
+        });
+    }
+
+    resp.json( user )
 }

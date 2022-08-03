@@ -1,5 +1,5 @@
 import Role from "../models/role.js";
-import User from "../models/user.js";
+import UserModel from "../models/UserModel.js";
 
 export const isRoleValid = async( rol = '' ) => {
     const existRol = await Role.findOne({ rol });
@@ -10,7 +10,7 @@ export const isRoleValid = async( rol = '' ) => {
 }
 
 export const existEmail = async( email = '') => {
-    const existEmail = await User.findOne({ email });
+    const existEmail = await UserModel.findOne({ email });
 
     if( existEmail ) {
         throw new Error(`The email ${ email } already exist `)
@@ -18,7 +18,7 @@ export const existEmail = async( email = '') => {
 }
 
 export const findUserById = async( id ) => {
-    const existUser = await User.findById(id);
+    const existUser = await UserModel.findById(id);
 
     if( !existUser ) {
         throw new Error(`The id ${ id } does not exist `);
